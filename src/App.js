@@ -1,25 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import TravelPlan from "./components/TravelPlan";
+import "./index.css";
+import airportImage from './assets/airport.jpg';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div
+      className="App min-h-screen bg-no-repeat bg-center"
+      style={{
+        backgroundImage: `url(${airportImage})`,
+        backgroundSize: 'cover',  
+        backgroundPosition: 'center',  // Centers the image
+        backgroundAttachment: 'fixed'  // Optional: Makes the background fixed during scrolling
+      }}
+    >
+      <div className="w-full rounded-lg shadow-xl p-12 mx-auto ">
+        <TravelPlan />
+      </div>
     </div>
   );
 }
 
 export default App;
+
