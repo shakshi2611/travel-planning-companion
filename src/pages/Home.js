@@ -2,13 +2,18 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../index.css";
 import airportImage from '../assets/airport.jpg';
+import { Link } from "react-router-dom";
 
-const AirlineCard = ({ airline }) => {
+const AirlineCard = ({ airline, handleSelectAirline, selectedAirlines }) => {
+  const isSelected = selectedAirlines.some(
+    (selectedAirline) => selectedAirline.id === airline.id
+  );
+
   return (
     <div className="airline-card bg-white bg-opacity-55 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
       <h3 className="text-2xl text-black font-semibold mb-4">{airline.name}</h3>
       <p className="text-md mb-6 text-gray-100">
-        Destination: {airline.destinations.map(destination => destination.name).join(", ")}
+        Destinations: {airline.destinations.map(destination => destination.name).join(", ")}
       </p>
 
       {/* Direct booking link */}
@@ -22,6 +27,18 @@ const AirlineCard = ({ airline }) => {
           Book Now
         </a>
       )}
+
+      {/* Select Airline Button */}
+      <button
+        onClick={() => handleSelectAirline(airline)}
+        className={`py-2 px-4 rounded-lg mt-4 transition-colors duration-300 ${
+          isSelected
+            ? "bg-green-500 text-white hover:bg-green-600"
+            : "bg-blue-500 text-black hover:bg-blue-600"
+        }`}
+      >
+        {isSelected ? "Selected" : "Select Airline"}
+      </button>
     </div>
   );
 };
@@ -35,6 +52,7 @@ const HomePage = () => {
   const [filteredAirlines, setFilteredAirlines] = useState([]);
   const [searchClicked, setSearchClicked] = useState(false);
   const [sameCityError, setSameCityError] = useState(false);
+  const [selectedAirlines, setSelectedAirlines] = useState([]);
 
   // Fetch airline data from API
   const fetchAirlines = async () => {
@@ -51,6 +69,13 @@ const HomePage = () => {
   useEffect(() => {
     fetchAirlines();
   }, []);
+
+  const handleSelectAirline = (airline) => {
+    // Prevent adding duplicates
+    if (!selectedAirlines.some((selectedAirline) => selectedAirline.id === airline.id)) {
+      setSelectedAirlines((prevState) => [...prevState, airline]);
+    }
+  };
 
   const filterAirlines = () => {
     if (!departureCity || !arrivalCity) {
@@ -92,7 +117,8 @@ const HomePage = () => {
       }}
     >
       <div className="container mx-auto py-12 text-center text-white">
-        <h1 className="text-6xl font-bold mb-8">Travel Planning Companion</h1>
+        <h1 className="text-6xl font-bold mb-4">RoamRoute</h1>
+        <p className="mb-8 text-2xl font-bold">"Pack Your Bags, We've Got the Plan"</p>
 
         {/* Input fields for departure and arrival cities */}
         <div className="mb-8">
@@ -142,9 +168,23 @@ const HomePage = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 mt-8 mx-12">
             {filteredAirlines.map((airline) => (
-              <AirlineCard key={airline.id} airline={airline} />
+              <AirlineCard
+                key={airline.id}
+                airline={airline}
+                handleSelectAirline={handleSelectAirline}
+                selectedAirlines={selectedAirlines}
+              />
             ))}
           </div>
+        )}
+
+        {/* Show "Compare Selected Airlines" button only when there are filtered airlines */}
+        {filteredAirlines.length > 0 && selectedAirlines.length > 0 && (
+          <Link to="/compare" state={{ selectedAirlines }}>
+            <button className="bg-green-500 text-white py-2 px-6 rounded-lg mt-8 hover:bg-green-600 transition-colors">
+              Compare Selected Airlines
+            </button>
+          </Link>
         )}
       </div>
     </div>
